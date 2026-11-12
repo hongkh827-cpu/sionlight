@@ -1,0 +1,109 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SIONLIGHT | 네 개의 방</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#101728;color:#fff;font-family:Arial,"Malgun Gothic",sans-serif}
+header{text-align:center;padding:45px 15px;background:linear-gradient(135deg,#192b50,#5c4a70)}
+h1{font-size:32px;letter-spacing:3px}
+header p{color:#e4e6f2}
+main{max-width:950px;margin:35px auto;padding:15px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px}
+.card{background:#202d47;border:1px solid #4d5d7d;border-radius:16px;padding:25px;text-align:center}
+.card h2{color:#f4d99b}
+button,a.btn{background:#d8b975;color:#172039;border:0;border-radius:9px;padding:12px 20px;cursor:pointer;font-weight:bold;text-decoration:none;display:inline-block}
+section.room{display:none;background:#202d47;border-radius:16px;padding:25px;margin-top:25px}
+textarea{width:100%;height:150px;padding:15px;border-radius:10px;font-size:16px}
+.note{color:#ccd3e0;font-size:14px;line-height:1.7}
+footer{text-align:center;padding:35px;color:#b8c0d0}
+</style>
+</head>
+<body>
+<header>
+<h1>SIONLIGHT</h1>
+<p>당신의 마음이 쉬어 가는 네 개의 방</p>
+<a class="btn" href="./index.html">성전으로 돌아가기</a>
+</header>
+<main>
+<div class="grid">
+<div class="card">
+<h2>♡ 마음의 방</h2>
+<p>지친 마음과 고민을 내려놓는 곳</p>
+<button onclick="openRoom('heart')">입장하기</button>
+</div>
+<div class="card">
+<h2>✿ 추억의 방</h2>
+<p>그리운 사람에게 편지를 쓰는 곳</p>
+<button onclick="openRoom('memory')">입장하기</button>
+</div>
+<div class="card">
+<h2>✝ 기도의 방</h2>
+<p>말씀을 묵상하고 기도하는 곳</p>
+<button onclick="openRoom('prayer')">입장하기</button>
+</div>
+<div class="card">
+<h2>♧ 만남의 방</h2>
+<p>사람과 사람이 위로를 나누는 곳</p>
+<button onclick="openRoom('meeting')">입장하기</button>
+</div>
+</div>
+
+<section class="room" id="heart">
+<h2>♡ 마음의 방</h2>
+<p>누구에게도 하지 못한 이야기를 적어보세요.</p>
+<textarea placeholder="오늘 내 마음은..."></textarea>
+<p class="note">작성한 글은 서버에 전송되거나 자동 저장되지 않습니다. 창을 닫으면 사라질 수 있습니다.</p>
+<button onclick="copyText('heart')">글 복사하기</button>
+</section>
+
+<section class="room" id="memory">
+<h2>✿ 추억의 방</h2>
+<p>그리운 사람에게 마음을 전하는 편지를 써보세요.</p>
+<textarea placeholder="그리운 당신에게..."></textarea>
+<p class="note">이 공간은 추억을 기록하는 곳이며 실제 영혼과 대화하는 서비스가 아닙니다.</p>
+<button onclick="copyText('memory')">편지 복사하기</button>
+</section>
+
+<section class="room" id="prayer">
+<h2>✝ 기도의 방</h2>
+<p>"수고하고 무거운 짐 진 자들아 다 내게로 오라" (마태복음 11:28 일부)</p>
+<textarea placeholder="오늘의 기도..."></textarea>
+<p class="note">기도문은 자동 저장되지 않습니다.</p>
+<button onclick="copyText('prayer')">기도문 복사하기</button>
+</section>
+
+<section class="room" id="meeting">
+<h2>♧ 만남의 방</h2>
+<p>서로의 이야기를 듣고 격려하는 공동체를 준비하고 있습니다.</p>
+<p class="note">현재는 안내 공간이며 실제 채팅이나 회원 간 대화 기능은 아직 없습니다.</p>
+</section>
+</main>
+<footer>SIONLIGHT · 누구도 혼자가 아닌 공간</footer>
+<script>
+function openRoom(id){
+document.querySelectorAll('.room').forEach(el=>el.style.display='none');
+const room=document.getElementById(id);
+room.style.display='block';
+room.scrollIntoView({behavior:'smooth'});
+}
+function copyText(id){
+const value=document.querySelector('#'+id+' textarea').value;
+if(!value.trim()){alert('먼저 글을 작성해 주세요.');return;}
+if(navigator.clipboard&&window.isSecureContext){
+navigator.clipboard.writeText(value).then(()=>alert('복사했어요.')).catch(()=>fallback(value));
+}else{fallback(value);}
+}
+function fallback(value){
+const t=document.createElement('textarea');
+t.value=value;document.body.appendChild(t);t.select();
+try{document.execCommand('copy');alert('복사했어요.');}
+catch(e){alert('복사할 수 없습니다. 글을 직접 선택해 복사해 주세요.');}
+t.remove();
+}
+</script>
+</body>
+</html>
