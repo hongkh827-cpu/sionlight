@@ -24,13 +24,93 @@
 <p class="note warning">※ 위 가격은 검토 중인 잠정안입니다. 현재 결제는 진행되지 않습니다.</p>
 <section class="panel" aria-label="대화 체험">
 <div class="status"><div><div class="note">선택한 대화 시간 · 화면 체험</div><div class="clock" id="clock">30:00</div></div><div class="controls"><button class="action" id="start">타이머 체험 시작</button><button class="action secondary" id="pause" disabled>일시정지</button><button class="action secondary" id="reset">초기화</button></div></div>
-<div class="messages" id="messages" aria-live="polite"><div class="bubble guide" id="welcome">안녕하세요. 마음의 방에 오신 것을 환영합니다. 지금은 화면을 확인하는 체험 단계입니다.</div></div>
-<form id="messageForm"><textarea id="messageInput" maxlength="2000" placeholder="이곳에 이야기를 적어 보세요. (아직 AI에 전송되지 않습니다)" aria-label="대화 내용"></textarea><button class="action" type="submit">화면에 표시</button></form>
-<p class="note">현재 작성한 글은 이 브라우저 화면에만 표시되며 AI에 전송되거나 서버에 저장되지 않습니다. 새로고침하면 사라집니다. 실제 서비스에는 안전한 로그인·결제·대화 보존 기능을 별도로 연결할 예정입니다.</p>
+<div class="messages" id="messages" aria-live="polite"><div class="bubble guide" id="welcome">안녕하세요. SIONLIGHT에 오신 것을 환영합니다. 대화 방을 선택하고 AI에게 질문해 보세요.</div></div>
+<form id="messageForm"><textarea id="messageInput" maxlength="2000" placeholder="AI에게 질문하거나 이야기를 적어 보세요." aria-label="대화 내용"></textarea><button class="action" type="submit">AI에게 전송</button></form>
+<p class="note">현재 AI 대화는 무료 시험 운영 중입니다. 질문은 AI 답변 생성을 위해 외부 AI 서비스로 전송됩니다. 이 페이지에는 대화 저장·로그인·결제 기능이 없으며, 새로고침하면 화면의 대화가 사라집니다. 운영 서버 및 AI 제공업체의 처리·보관 정책은 별도로 적용될 수 있습니다.</p>
 <p class="note">AI는 전문 상담사나 목회자를 대신하지 않습니다. 긴급한 위험이 있다면 AI 답변을 기다리지 말고 즉시 현지 긴급 서비스나 주변 사람에게 도움을 요청하세요.</p>
 </section><footer>© SIONLIGHT · 빛과 위로가 머무는 공간</footer>
 </main>
 <script>
-(()=>{'use strict';let room='heart',minutes=30,remaining=1800,running=false,timer=null;const $=id=>document.getElementById(id),clock=$('clock'),messages=$('messages');const titles={heart:'마음 상담',bible:'성경 대화',friend:'AI 동행'};function draw(){clock.textContent=String(Math.floor(remaining/60)).padStart(2,'0')+':'+String(remaining%60).padStart(2,'0');$('start').disabled=running||remaining===0;$('pause').disabled=!running;$('pause').textContent='일시정지'}function stop(){running=false;if(timer!==null){clearInterval(timer);timer=null}draw()}function reset(){stop();remaining=minutes*60;draw()}function add(text,type){const d=document.createElement('div');d.className='bubble '+type;d.textContent=text;messages.append(d);messages.scrollTop=messages.scrollHeight}document.querySelectorAll('[data-room]').forEach(b=>b.addEventListener('click',()=>{room=b.dataset.room;document.querySelectorAll('[data-room]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));add(titles[room]+'을 선택했습니다. 실제 AI 대화는 연결 준비 중입니다.','guide')}));document.querySelectorAll('[data-minutes]').forEach(b=>b.addEventListener('click',()=>{minutes=Number(b.dataset.minutes);document.querySelectorAll('[data-minutes]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));reset()}));$('start').addEventListener('click',()=>{if(running||remaining===0)return;running=true;draw();timer=setInterval(()=>{if(!running)return;remaining=Math.max(0,remaining-1);draw();if(remaining===0){stop();add('체험 시간이 끝났습니다. 실제 서비스에서는 대화 내용을 보존하고 추가 이용권을 안내합니다.','guide')}},1000)});$('pause').addEventListener('click',stop);$('reset').addEventListener('click',reset);$('messageForm').addEventListener('submit',e=>{e.preventDefault();const input=$('messageInput'),v=input.value.trim();if(!v)return;add(v,'visitor');input.value='';add('지금은 시제품이므로 AI가 답변하지 않습니다. 실제 AI 연결은 다음 단계에서 진행합니다.','guide')});draw()})();
+(() => {
+  'use strict';
+  const API_URL = 'https://sionlight-ai.hongkh827.workers.dev/';
+  let room = 'heart', minutes = 30, remaining = 1800, running = false, timer = null, sending = false;
+  const $ = id => document.getElementById(id);
+  const clock = $('clock'), messages = $('messages');
+  const form = $('messageForm'), input = $('messageInput');
+  const sendButton = form.querySelector('button[type="submit"]');
+  const titles = {heart:'마음 상담', bible:'성경 대화', companion:'AI 동행'};
+  function draw() {
+    clock.textContent = String(Math.floor(remaining/60)).padStart(2,'0') + ':' + String(remaining%60).padStart(2,'0');
+    $('start').disabled = running || remaining === 0;
+    $('pause').disabled = !running;
+    $('pause').textContent = '일시정지';
+  }
+  function stop() {
+    running = false;
+    if (timer !== null) { clearInterval(timer); timer = null; }
+    draw();
+  }
+  function reset() { stop(); remaining = minutes * 60; draw(); }
+  function add(text, type) {
+    const d = document.createElement('div');
+    d.className = 'bubble ' + type;
+    d.textContent = text;
+    messages.append(d);
+    messages.scrollTop = messages.scrollHeight;
+    return d;
+  }
+  document.querySelectorAll('[data-room]').forEach(b => b.addEventListener('click', () => {
+    room = b.dataset.room === 'friend' ? 'companion' : b.dataset.room;
+    document.querySelectorAll('[data-room]').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    add(titles[room] + '을 선택했습니다.', 'guide');
+  }));
+  document.querySelectorAll('[data-minutes]').forEach(b => b.addEventListener('click', () => {
+    minutes = Number(b.dataset.minutes);
+    document.querySelectorAll('[data-minutes]').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    reset();
+  }));
+  $('start').addEventListener('click', () => {
+    if (running || remaining === 0) return;
+    running = true; draw();
+    timer = setInterval(() => {
+      if (!running) return;
+      remaining = Math.max(0, remaining - 1);
+      draw();
+      if (remaining === 0) { stop(); add('체험 시간이 끝났습니다.', 'guide'); }
+    }, 1000);
+  });
+  $('pause').addEventListener('click', stop);
+  $('reset').addEventListener('click', reset);
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    const message = input.value.trim();
+    if (!message || sending) return;
+    const requestedRoom = room;
+    add(message, 'visitor');
+    input.value = '';
+    sending = true;
+    sendButton.disabled = true;
+    const pending = add('AI가 답변을 준비하고 있습니다...', 'guide');
+    try {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({room:requestedRoom, message})
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || '서버 연결 오류');
+      pending.textContent = data.answer || '답변을 생성하지 못했습니다.';
+    } catch (error) {
+      pending.textContent = 'AI 연결에 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.';
+      console.error('SIONLIGHT AI:', error);
+    } finally {
+      messages.scrollTop = messages.scrollHeight;
+      sending = false;
+      sendButton.disabled = false;
+    }
+  });
+  draw();
+})();
 </script>
 </body></html>
