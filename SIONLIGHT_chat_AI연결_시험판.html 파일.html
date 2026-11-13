@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SIONLIGHT | 마음의 대화실</title>
+<style>
+:root{color-scheme:dark;--bg:#091321;--panel:#111f30;--gold:#e6c58c;--muted:#b7c3d1;--line:#304054}*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#22334d,#091321 70%);color:#f6f3ee;font-family:system-ui,-apple-system,'Malgun Gothic',sans-serif;line-height:1.6}main{max-width:930px;margin:auto;padding:30px 18px 60px}a{color:var(--gold)}header{text-align:center;padding:20px 0 28px}.brand{letter-spacing:.3em;color:var(--gold);font-size:13px}h1{font-size:clamp(25px,5vw,38px);margin:10px 0}p{color:var(--muted)}.rooms,.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.choice{border:1px solid var(--line);background:var(--panel);border-radius:15px;padding:17px 12px;color:inherit;text-align:left;cursor:pointer;font:inherit;min-height:125px}.choice strong{display:block;color:#fff;font-size:16px}.choice small{display:block;color:var(--muted);margin-top:7px;font-size:12px}.choice[aria-pressed=true]{border-color:var(--gold);background:#273249;box-shadow:0 0 0 1px var(--gold) inset}.section-title{font-size:18px;color:var(--gold);margin:30px 0 12px}.panel{border:1px solid var(--line);background:rgba(17,31,48,.95);border-radius:17px;padding:20px;margin-top:20px}.status{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.clock{font-size:34px;font-variant-numeric:tabular-nums;font-weight:700;color:var(--gold)}.controls{display:flex;flex-wrap:wrap;gap:8px}button.action{border:1px solid #d6b779;border-radius:9px;background:#d6b779;color:#172132;padding:9px 14px;font-weight:700;cursor:pointer}button.secondary{background:transparent;color:#e6c58c}button:disabled{opacity:.45;cursor:not-allowed}.messages{min-height:170px;max-height:370px;overflow:auto;background:#0a1725;border-radius:12px;padding:15px;margin:15px 0}.bubble{max-width:85%;padding:10px 13px;border-radius:12px;margin:9px 0;white-space:pre-wrap;overflow-wrap:anywhere}.visitor{background:#2d4258;margin-left:auto}.guide{background:#1b2b3c;border:1px solid #334457}form{display:flex;gap:9px}textarea{flex:1;resize:vertical;min-height:68px;background:#0b1827;border:1px solid #42516a;border-radius:10px;padding:12px;color:white;font:inherit}footer{margin-top:25px;text-align:center;color:var(--muted);font-size:13px}.note{font-size:13px;color:#c9d2dd}.warning{color:#f1d2a3}@media(max-width:650px){.rooms,.plans{grid-template-columns:1fr}.choice{min-height:unset}.bubble{max-width:95%}form{flex-direction:column}}
+</style>
+</head>
+<body><main>
+<header><div class="brand">SIONLIGHT</div><h1>마음의 대화실</h1><p>당신의 이야기를 소중히 듣는 공간</p><a href="./sanctuary.html">← 성전 내부로 돌아가기</a></header>
+<h2 class="section-title">1. 대화 방식 선택</h2>
+<div class="rooms" id="rooms">
+<button class="choice" data-room="heart" aria-pressed="true"><strong>♡ 마음의 쉼</strong><small>삶의 고민과 마음을 나누는 곳</small></button>
+<button class="choice" data-room="bible" aria-pressed="false"><strong>✝ 말씀 너머</strong><small>성경을 질문하고 함께 탐구하는 곳</small></button>
+<button class="choice" data-room="companion" aria-pressed="false"><strong>✦ 삶의 동행</strong><small>일상과 추억을 나누는 말벗 공간</small></button>
+</div>
+<h2 class="section-title">2. 이용 시간 선택</h2>
+<div class="plans" id="plans">
+<button class="choice" data-minutes="15" aria-pressed="false"><strong>15분 · 300원</strong><small>가벼운 대화</small></button>
+<button class="choice" data-minutes="30" aria-pressed="true"><strong>30분 · 500원</strong><small>충분한 대화</small></button>
+<button class="choice" data-minutes="60" aria-pressed="false"><strong>60분 · 900원</strong><small>깊은 대화</small></button>
+</div>
+<p class="note warning">※ 요금은 검토 중인 잠정안입니다. 현재 결제되지 않으며, 시간 선택은 화면 체험용입니다.</p>
+<section class="panel" aria-label="대화 체험">
+<div class="status"><div><div class="note">선택한 대화 시간 · 타이머 체험</div><div class="clock" id="clock">30:00</div></div><div class="controls"><button class="action" id="start">타이머 체험 시작</button><button class="action secondary" id="pause" disabled>일시정지</button><button class="action secondary" id="reset">초기화</button></div></div>
+<div class="messages" id="messages" aria-live="polite"><div class="bubble guide" id="welcome">안녕하세요. 마음의 쉼에 오신 것을 환영합니다. AI 시험 대화는 브라우저당 최대 5회까지 가능합니다.</div></div>
+<form id="messageForm"><textarea id="messageInput" maxlength="2000" placeholder="이곳에 이야기를 적어 보세요. (전송하면 AI 서버에 전달됩니다)" aria-label="대화 내용"></textarea><button class="action" type="submit" id="sendButton">AI에 보내기</button></form>
+<p class="note">시험 대화: 이 화면에서 보낸 질문은 Cloudflare를 거쳐 Google Gemini에 전달됩니다. 브라우저에 대화 내역을 저장하지 않으며 새로고침하면 화면에서 사라집니다. 이 5회 제한은 브라우저 기준으로, 서버 전체 사용량을 보장하거나 통제하지는 못합니다. 개인정보나 민감한 정보는 입력하지 마세요.</p>
+<p class="note">AI는 전문 상담사나 목회자를 대신하지 않습니다. 긴급한 위험이 있다면 AI 답변을 기다리지 말고 즉시 현지 긴급 서비스나 주변 사람에게 도움을 요청하세요.</p>
+</section><footer>© SIONLIGHT · 빛과 위로가 머무는 공간</footer>
+</main>
+<script>
+(()=>{'use strict';
+const API='https://sionlight-ai.hongkh827.workers.dev/';
+const MAX=5, KEY='sionlight_trial_count_v1';
+let room='heart', minutes=30, remaining=1800, running=false, timer=null, busy=false, lastSent=0;
+const $=id=>document.getElementById(id), clock=$('clock'), messages=$('messages');
+const titles={heart:'마음의 쉼',bible:'말씀 너머',companion:'삶의 동행'};
+function used(){try{return Math.max(0,Number(sessionStorage.getItem(KEY))||0)}catch{return 0}}
+function saveUsed(n){try{sessionStorage.setItem(KEY,String(n))}catch{}}
+function add(text,type){const d=document.createElement('div');d.className='bubble '+type;d.textContent=text;messages.append(d);messages.scrollTop=messages.scrollHeight}
+function draw(){clock.textContent=String(Math.floor(remaining/60)).padStart(2,'0')+':'+String(remaining%60).padStart(2,'0');$('start').disabled=running||remaining===0;$('pause').disabled=!running;$('pause').textContent='일시정지';$('sendButton').disabled=busy||used()>=MAX;$('sendButton').textContent=busy?'응답 기다리는 중…':used()>=MAX?'시험 질문 완료':'AI에 보내기 ('+(MAX-used())+'회 남음)'}
+function stop(){running=false;if(timer!==null){clearInterval(timer);timer=null}draw()}
+function reset(){stop();remaining=minutes*60;draw()}
+document.querySelectorAll('[data-room]').forEach(b=>b.addEventListener('click',()=>{room=b.dataset.room;document.querySelectorAll('[data-room]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));add(titles[room]+'을 선택했습니다.','guide')}));
+document.querySelectorAll('[data-minutes]').forEach(b=>b.addEventListener('click',()=>{minutes=Number(b.dataset.minutes);document.querySelectorAll('[data-minutes]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));reset()}));
+$('start').addEventListener('click',()=>{if(running||remaining===0)return;running=true;draw();timer=setInterval(()=>{if(!running)return;remaining=Math.max(0,remaining-1);draw();if(remaining===0){stop();add('타이머 체험이 끝났습니다. AI 시험 질문 횟수와는 별개입니다.','guide')}},1000)});
+$('pause').addEventListener('click',stop);$('reset').addEventListener('click',reset);
+$('messageForm').addEventListener('submit',async e=>{
+e.preventDefault();const input=$('messageInput'),v=input.value.trim();if(!v||busy)return;
+if(used()>=MAX){add('이 브라우저의 시험 질문 5회를 모두 사용했습니다.','guide');return}
+if(Date.now()-lastSent<15000){add('서버 부담을 줄이기 위해 질문 사이에 15초를 기다려 주세요.','guide');return}
+busy=true;lastSent=Date.now();saveUsed(used()+1);add(v,'visitor');input.value='';draw();
+try{
+const ctrl=new AbortController();const timeout=setTimeout(()=>ctrl.abort(),65000);
+let res;try{res=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({room,message:v}),signal:ctrl.signal})}finally{clearTimeout(timeout)}
+const data=await res.json().catch(()=>({}));
+if(!res.ok){add('서버 응답 오류 ('+res.status+'). 잠시 후 다시 확인해 주세요.','guide');return}
+const answer=data.reply??data.response??data.text??data.answer??data.message;
+add(typeof answer==='string'&&answer.trim()?answer:'서버가 응답했지만 답변 내용을 읽지 못했습니다.','guide');
+}catch(err){add(err.name==='AbortError'?'응답 시간이 초과됐습니다.':'AI 서버에 연결할 수 없습니다. 인터넷 연결과 서버 상태를 확인해 주세요.','guide')}
+finally{busy=false;draw()}
+});draw();
+})();
+</script>
+</body></html>
