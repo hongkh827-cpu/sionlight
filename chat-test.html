@@ -34,7 +34,7 @@ const $=id=>document.getElementById(id);
 const clock=$('clock'),messages=$('messages'),form=$('messageForm'),input=$('messageInput');
 const sendButton=form.querySelector('button[type="submit"]');
 const titles={heart:'마음의 쉼',bible:'말씀 너머',companion:'삶의 동행'};
-const histories={heart:[],bible:[],friend:[]};
+const histories={heart:[],bible:[],companion:[]};
 const introductions={bible:'말씀 너머입니다. 궁금한 성경 말씀을 질문해 주세요.',companion:'삶의 동행입니다. 일상과 추억을 함께 이야기해요.'};
 function draw(){
 clock.textContent=String(Math.floor(remaining/60)).padStart(2,'0')+':'+String(remaining%60).padStart(2,'0');
