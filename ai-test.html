@@ -1,0 +1,127 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SIONLIGHT | AI 비공개 기능 시험</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#101827;color:#f7f4ed;font-family:Arial,"Malgun Gothic",sans-serif}
+main{max-width:850px;margin:30px auto;padding:20px}
+h1{text-align:center;color:#e9cc85}
+.note{text-align:center;color:#c9cbd3;font-size:14px}
+nav{display:flex;gap:8px;margin:24px 0}
+nav button{flex:1;padding:14px 5px;background:#25354d;color:white;border:1px solid #66758b;border-radius:10px;cursor:pointer}
+nav button.active{background:#b9944c;color:#111;font-weight:bold}
+#messages{height:410px;overflow:auto;background:#192438;border:1px solid #3c4a60;border-radius:14px;padding:18px}
+.msg{white-space:pre-wrap;line-height:1.75;margin:12px 0;padding:14px;border-radius:12px;overflow-wrap:anywhere}
+.user{background:#354766;margin-left:12%}
+.model{background:#283747;margin-right:8%}
+footer{display:flex;gap:8px;margin-top:14px}
+textarea{flex:1;min-width:0;padding:12px;border-radius:10px;resize:vertical;font-size:15px}
+#send{padding:12px 20px;border:0;border-radius:10px;background:#d7b56a;cursor:pointer;font-weight:bold}
+#send:disabled{opacity:.5}
+small{display:block;text-align:center;margin-top:15px;color:#aeb7c5}
+</style>
+</head>
+<body>
+<main>
+<h1>✝ SIONLIGHT</h1>
+<p class="note">AI 대화방 기능 시험 · 정식 서비스 아님</p>
+<nav>
+<button data-room="heart" class="active">마음 상담</button>
+<button data-room="bible">성경 대화</button>
+<button data-room="companion">AI 동행</button>
+</nav>
+<section id="messages" aria-live="polite"></section>
+<footer>
+<textarea id="question" rows="3" maxlength="2000" placeholder="질문이나 이야기를 입력하세요."></textarea>
+<button id="send">보내기</button>
+</footer>
+<small>시험 중에는 개인정보를 입력하지 마세요. 대화는 현재 브라우저 화면에만 보관됩니다.</small>
+</main>
+<script>
+const API="https://sionlight-ai-test.hongkh827.workers.dev/";
+const rooms={
+ heart:[],
+ bible:[],
+ companion:[]
+};
+let room="heart";
+let busy=false;
+const messages=document.getElementById("messages");
+const question=document.getElementById("question");
+const send=document.getElementById("send");
+
+function render(){
+ messages.replaceChildren();
+ const entries=rooms[room];
+ if(!entries.length){
+  const welcome=document.createElement("div");
+  welcome.className="msg model";
+  welcome.textContent="환영합니다. 편안하게 이야기를 시작해 주세요.";
+  messages.appendChild(welcome);
+ }
+ for(const entry of entries){
+  const item=document.createElement("div");
+  item.className="msg "+entry.role;
+  item.textContent=entry.text;
+  messages.appendChild(item);
+ }
+ messages.scrollTop=messages.scrollHeight;
+}
+document.querySelectorAll("[data-room]").forEach(button=>{
+ button.addEventListener("click",()=>{
+  room=button.dataset.room;
+  document.querySelectorAll("[data-room]").forEach(b=>b.classList.toggle("active",b===button));
+  render();
+ });
+});
+async function submit(){
+ const text=question.value.trim();
+ if(!text||busy)return;
+ const activeRoom=room;
+ const previous=rooms[activeRoom].slice(-12);
+ rooms[activeRoom].push({role:"user",text});
+ question.value="";
+ busy=true;
+ send.disabled=true;
+ render();
+ try{
+  const response=await fetch(API,{
+   method:"POST",
+   headers:{"Content-Type":"application/json"},
+   body:JSON.stringify({
+    room:activeRoom,
+    history:previous,
+    message:text
+   })
+  });
+  const data=await response.json();
+  if(!response.ok)throw new Error(data.detail||data.error||"연결 오류");
+  rooms[activeRoom].push({
+   role:"model",
+   text:data.answer||"답변을 받지 못했습니다."
+  });
+ }catch(error){
+  rooms[activeRoom].push({
+   role:"model",
+   text:"시험 서버 오류: "+error.message
+  });
+ }
+ busy=false;
+ send.disabled=false;
+ render();
+}
+send.addEventListener("click",submit);
+question.addEventListener("keydown",event=>{
+ if(event.key==="Enter"&&!event.shiftKey){
+  event.preventDefault();
+  submit();
+ }
+});
+render();
+</script>
+</body>
+</html>
