@@ -76,7 +76,7 @@ const requestedRoom=room;
 add(message,'visitor',requestedRoom);input.value='';sending=true;sendButton.disabled=true;
 const pending=add('AI가 답변을 준비하고 있습니다...','guide',requestedRoom);
 try{
-const response=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({room:requestedRoom,message,history:histories[requestedRoom].slice(-12)}))});
+const response=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({room:requestedRoom,message,history:histories[requestedRoom].slice(-12)})});
 const data=await response.json();
 if(!response.ok)throw new Error(data.error||'서버 연결 오류');
 pending.textContent=data.answer||'답변을 생성하지 못했습니다.';
