@@ -13,10 +13,10 @@
 <div class="rooms" id="rooms">
 <button class="choice" data-room="heart" aria-pressed="false"><strong>♡ 마음의 쉼</strong><small>삶의 고민과 마음을 나누는 곳</small></button>
 <button class="choice" data-room="bible" aria-pressed="false"><strong>✝ 말씀 너머</strong><small>성경을 질문하고 함께 탐구하는 곳 · 무료</small></button>
-<button class="choice" type="button" disabled aria-disabled="true"><strong>✦ 삶의 동행</strong><small>사람과 사람의 만남과 소개 · 준비 중</small></button>
+<a class="choice" href="./companions.html" style="text-decoration:none;display:block"><strong>✦ 삶의 동행</strong><small>나를 소개하고 서로의 이야기를 나누는 공간</small></a>
 </div></div>
 <div id="roomDetail" hidden><button type="button" class="action secondary" id="backToRooms" style="margin-top:18px">← 대화실 선택으로 돌아가기</button><h2 class="section-title" id="roomTitle">이용 시간 선택</h2>
-<h2 class="section-title" id="planHeading" hidden>2. 이용 시간 선택</h2><p id="freeNotice" class="note" hidden>말씀 너머는 무료 성경 대화 공간입니다.</p>
+<h2 class="section-title" id="planHeading" hidden>2. 이용 시간 선택</h2><p id="freeNotice" class="note" hidden>말씀 너머는 누구나 무료로 이용할 수 있습니다.</p><div id="sermonArea" hidden><h2 class="section-title">SIONLIGHT 설교 영상 · 무료</h2><p>설교 영상을 자유롭게 시청할 수 있습니다.</p><div style="position:relative;aspect-ratio:16/9;border:1px solid var(--line);border-radius:14px;overflow:hidden"><iframe src="https://www.youtube-nocookie.com/embed/VlggK4Dcbu0" title="SIONLIGHT 설교 제1편" style="width:100%;height:100%;border:0" loading="lazy" allowfullscreen></iframe></div><p><a href="./sermon.html">설교실 전체 화면으로 보기</a></p></div>
 <div class="plans" id="plans" hidden>
 <button class="choice" data-minutes="15" aria-pressed="false"><strong>15분 · 300원</strong><small>가벼운 대화</small></button>
 <button class="choice" data-minutes="30" aria-pressed="true"><strong>30분 · 500원</strong><small>충분한 대화</small></button>
@@ -44,7 +44,7 @@ function add(text,type){const d=document.createElement('div');d.className='bubbl
 function draw(){clock.textContent=String(Math.floor(remaining/60)).padStart(2,'0')+':'+String(remaining%60).padStart(2,'0');$('start').disabled=running||remaining===0;$('pause').disabled=!running;$('pause').textContent='일시정지';$('sendButton').disabled=busy||used()>=MAX;$('sendButton').textContent=busy?'응답 기다리는 중…':used()>=MAX?'시험 질문 완료':'AI에 보내기 ('+(MAX-used())+'회 남음)'}
 function stop(){running=false;if(timer!==null){clearInterval(timer);timer=null}draw()}
 function reset(){stop();remaining=minutes*60;draw()}
-function enterRoom(selected){room=selected;document.querySelectorAll('[data-room]').forEach(x=>x.setAttribute('aria-pressed',String(x.dataset.room===room)));$('roomChooser').hidden=true;$('roomDetail').hidden=false;$('roomTitle').textContent=titles[room]+' · 이용 시간 선택';const isFree=room==='bible';['planHeading','plans','planNotice','timerSection'].forEach(id=>$(id).hidden=isFree);$('freeNotice').hidden=!isFree;$('chatPanel').hidden=false;$('welcome').textContent='안녕하세요. '+titles[room]+'에 오신 것을 환영합니다. AI 시험 대화는 브라우저당 최대 5회까지 가능합니다.';window.scrollTo(0,0)}
+function enterRoom(selected){room=selected;document.querySelectorAll('[data-room]').forEach(x=>x.setAttribute('aria-pressed',String(x.dataset.room===room)));$('roomChooser').hidden=true;$('roomDetail').hidden=false;$('roomTitle').textContent=titles[room]+(room==='bible'?' · 무료 성경 대화와 설교':' · 이용 시간 선택');const isFree=room==='bible';['planHeading','plans','planNotice','timerSection'].forEach(id=>$(id).hidden=isFree);$('freeNotice').hidden=!isFree;$('sermonArea').hidden=!isFree;$('chatPanel').hidden=false;$('welcome').textContent='안녕하세요. '+titles[room]+'에 오신 것을 환영합니다. AI 시험 대화는 브라우저당 최대 5회까지 가능합니다.';window.scrollTo(0,0)}
 document.querySelectorAll('[data-room]').forEach(b=>b.addEventListener('click',()=>enterRoom(b.dataset.room)));
 $('backToRooms').addEventListener('click',()=>{stop();$('roomDetail').hidden=true;$('roomChooser').hidden=false;document.querySelectorAll('[data-room]').forEach(x=>x.setAttribute('aria-pressed','false'));room=null;window.scrollTo(0,0)});
 document.querySelectorAll('[data-minutes]').forEach(b=>b.addEventListener('click',()=>{minutes=Number(b.dataset.minutes);document.querySelectorAll('[data-minutes]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));reset()}));
