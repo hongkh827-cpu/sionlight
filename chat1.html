@@ -9,12 +9,13 @@
 </head>
 <body><main>
 <header><div class="brand">SIONLIGHT</div><h1>마음의 대화실</h1><p>당신의 이야기를 소중히 듣는 공간</p><a href="./sanctuary.html">← 성전 내부로 돌아가기</a></header>
-<h2 class="section-title">1. 대화 방식 선택</h2>
+<div id="roomChooser"><h2 class="section-title">대화실을 선택해 주세요</h2>
 <div class="rooms" id="rooms">
 <button class="choice" data-room="heart" aria-pressed="false"><strong>♡ 마음의 쉼</strong><small>삶의 고민과 마음을 나누는 곳</small></button>
 <button class="choice" data-room="bible" aria-pressed="false"><strong>✝ 말씀 너머</strong><small>성경을 질문하고 함께 탐구하는 곳</small></button>
 <button class="choice" data-room="companion" aria-pressed="false"><strong>✦ 삶의 동행</strong><small>일상과 추억을 나누는 말벗 공간</small></button>
-</div>
+</div></div>
+<div id="roomDetail" hidden><button type="button" class="action secondary" id="backToRooms" style="margin-top:18px">← 대화실 선택으로 돌아가기</button><h2 class="section-title" id="roomTitle">이용 시간 선택</h2>
 <h2 class="section-title" id="planHeading" hidden>2. 이용 시간 선택</h2>
 <div class="plans" id="plans" hidden>
 <button class="choice" data-minutes="15" aria-pressed="false"><strong>15분 · 300원</strong><small>가벼운 대화</small></button>
@@ -28,7 +29,7 @@
 <form id="messageForm"><textarea id="messageInput" maxlength="2000" placeholder="이곳에 이야기를 적어 보세요. (전송하면 AI 서버에 전달됩니다)" aria-label="대화 내용"></textarea><button class="action" type="submit" id="sendButton">AI에 보내기</button></form>
 <p class="note">시험 대화: 이 화면에서 보낸 질문은 Cloudflare를 거쳐 Google Gemini에 전달됩니다. 브라우저에 대화 내역을 저장하지 않으며 새로고침하면 화면에서 사라집니다. 이 5회 제한은 브라우저 기준으로, 서버 전체 사용량을 보장하거나 통제하지는 못합니다. 개인정보나 민감한 정보는 입력하지 마세요.</p>
 <p class="note">AI는 전문 상담사나 목회자를 대신하지 않습니다. 긴급한 위험이 있다면 AI 답변을 기다리지 말고 즉시 현지 긴급 서비스나 주변 사람에게 도움을 요청하세요.</p>
-</section><footer>© SIONLIGHT · 빛과 위로가 머무는 공간</footer>
+</section></div><footer>© SIONLIGHT · 빛과 위로가 머무는 공간</footer>
 </main>
 <script>
 (()=>{'use strict';
@@ -43,7 +44,9 @@ function add(text,type){const d=document.createElement('div');d.className='bubbl
 function draw(){clock.textContent=String(Math.floor(remaining/60)).padStart(2,'0')+':'+String(remaining%60).padStart(2,'0');$('start').disabled=running||remaining===0;$('pause').disabled=!running;$('pause').textContent='일시정지';$('sendButton').disabled=busy||used()>=MAX;$('sendButton').textContent=busy?'응답 기다리는 중…':used()>=MAX?'시험 질문 완료':'AI에 보내기 ('+(MAX-used())+'회 남음)'}
 function stop(){running=false;if(timer!==null){clearInterval(timer);timer=null}draw()}
 function reset(){stop();remaining=minutes*60;draw()}
-document.querySelectorAll('[data-room]').forEach(b=>b.addEventListener('click',()=>{room=b.dataset.room;document.querySelectorAll('[data-room]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));['planHeading','plans','planNotice','chatPanel'].forEach(id=>$(id).hidden=false);$('welcome').textContent='안녕하세요. '+titles[room]+'에 오신 것을 환영합니다. AI 시험 대화는 브라우저당 최대 5회까지 가능합니다.';add(titles[room]+'을 선택했습니다.','guide')}));
+function enterRoom(selected){room=selected;document.querySelectorAll('[data-room]').forEach(x=>x.setAttribute('aria-pressed',String(x.dataset.room===room)));$('roomChooser').hidden=true;$('roomDetail').hidden=false;$('roomTitle').textContent=titles[room]+' · 이용 시간 선택';['planHeading','plans','planNotice','chatPanel'].forEach(id=>$(id).hidden=false);$('welcome').textContent='안녕하세요. '+titles[room]+'에 오신 것을 환영합니다. AI 시험 대화는 브라우저당 최대 5회까지 가능합니다.';window.scrollTo(0,0)}
+document.querySelectorAll('[data-room]').forEach(b=>b.addEventListener('click',()=>enterRoom(b.dataset.room)));
+$('backToRooms').addEventListener('click',()=>{stop();$('roomDetail').hidden=true;$('roomChooser').hidden=false;document.querySelectorAll('[data-room]').forEach(x=>x.setAttribute('aria-pressed','false'));room=null;window.scrollTo(0,0)});
 document.querySelectorAll('[data-minutes]').forEach(b=>b.addEventListener('click',()=>{minutes=Number(b.dataset.minutes);document.querySelectorAll('[data-minutes]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));reset()}));
 $('start').addEventListener('click',()=>{if(running||remaining===0)return;running=true;draw();timer=setInterval(()=>{if(!running)return;remaining=Math.max(0,remaining-1);draw();if(remaining===0){stop();add('타이머 체험이 끝났습니다. AI 시험 질문 횟수와는 별개입니다.','guide')}},1000)});
 $('pause').addEventListener('click',stop);$('reset').addEventListener('click',reset);
@@ -62,7 +65,7 @@ add(typeof answer==='string'&&answer.trim()?answer:'서버가 응답했지만 �
 }catch(err){add(err.name==='AbortError'?'응답 시간이 초과됐습니다.':'AI 서버에 연결할 수 없습니다. 인터넷 연결과 서버 상태를 확인해 주세요.','guide')}
 finally{busy=false;draw()}
 });
-const requested=new URLSearchParams(location.search).get('room');if(requested&&titles[requested]){document.querySelector('[data-room="'+requested+'"]').click()}draw();
+const requested=new URLSearchParams(location.search).get('room');if(requested&&titles[requested]){enterRoom(requested)}draw();
 })();
 </script>
 </body></html>
