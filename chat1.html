@@ -12,7 +12,7 @@
 <div id="roomChooser"><h2 class="section-title">대화실을 선택해 주세요</h2>
 <div class="rooms" id="rooms">
 <button class="choice" data-room="heart" aria-pressed="false"><strong>♡ 마음의 쉼</strong><small>삶의 고민과 마음을 나누는 곳</small></button>
-<button class="choice" data-room="bible" aria-pressed="false"><strong>✝ 말씀 너머</strong><small>성경을 질문하고 함께 탐구하는 곳 · 무료</small></button>
+<a class="choice" href="./sermon.html" style="text-decoration:none;display:block"><strong>✝ 말씀 너머</strong><small>SIONLIGHT 설교 동영상 시청 · 무료</small></a>
 <a class="choice" href="./companions.html" style="text-decoration:none;display:block"><strong>✦ 삶의 동행</strong><small>나를 소개하고 서로의 이야기를 나누는 공간</small></a>
 </div></div>
 <div id="roomDetail" hidden><button type="button" class="action secondary" id="backToRooms" style="margin-top:18px">← 대화실 선택으로 돌아가기</button><h2 class="section-title" id="roomTitle">이용 시간 선택</h2>
@@ -65,7 +65,7 @@ add(typeof answer==='string'&&answer.trim()?answer:'서버가 응답했지만 �
 }catch(err){add(err.name==='AbortError'?'응답 시간이 초과됐습니다.':'AI 서버에 연결할 수 없습니다. 인터넷 연결과 서버 상태를 확인해 주세요.','guide')}
 finally{busy=false;draw()}
 });
-const requested=new URLSearchParams(location.search).get('room');if(requested&&titles[requested]){enterRoom(requested)}draw();
+const requested=new URLSearchParams(location.search).get('room');if(requested==='bible'){location.replace('./sermon.html')}else if(requested&&titles[requested]){enterRoom(requested)}draw();
 })();
 </script>
 </body></html>
