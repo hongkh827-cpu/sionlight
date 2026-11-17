@@ -6,6 +6,7 @@
 <title>시온라이트 교리 | SIONLIGHT</title>
 <style>
 [hidden]{display:none!important}html{color-scheme:dark}body{margin:0;background:#101927;color:#edf1f6;font:1rem/1.7 system-ui,sans-serif}main{max-width:42rem;margin:auto;padding:2rem 1.25rem}a,h1,h2{color:#f3d49b}section{background:#162437;border:1px solid #9b8056;border-radius:1rem;padding:1.25rem;margin-top:1rem}h2{margin-top:0}section p:last-child{margin-bottom:0}
+main > section{-webkit-user-select:none;user-select:none}
 </style>
 </head>
 <body><main>
@@ -23,6 +24,10 @@
 <script>
   document.getElementById('empty-state').hidden =
     Boolean(document.querySelector('main > section:not([hidden])'));
+  document.querySelectorAll('main > section').forEach(section => {
+    section.addEventListener('copy', event => event.preventDefault());
+    section.addEventListener('contextmenu', event => event.preventDefault());
+  });
 </script>
 </main></body>
 </html>
