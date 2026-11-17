@@ -12,6 +12,11 @@ main > section{-webkit-user-select:none;user-select:none}
 <body><main>
 <a href="sanctuary.html">← 성전으로 돌아가기</a>
 <h1>시온라이트 이야기</h1>
+<article id="story-01">
+  <h2>01. 악을 이기고 평화를 지키는 말씀</h2>
+  <iframe src="https://www.youtube-nocookie.com/embed/KnUD6MEbftM" title="시온라이트 이야기 01" style="display:block;width:100%;max-width:360px;aspect-ratio:9/16;margin:auto;border:0" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+  <p><a href="https://youtube.com/shorts/KnUD6MEbftM">유튜브에서 보기</a></p>
+</article>
 <!-- 교리를 추가할 때 아래 section 한 묶음을 복사해 제목과 본문을 입력하세요.
 빈 문단을 채운 뒤 section의 hidden을 지우면 방문자에게 보입니다.
 장을 추가할 때 장 제목의 id와 section의 aria-labelledby를 같은 새 값으로 바꾸세요.
@@ -23,7 +28,7 @@ main > section{-webkit-user-select:none;user-select:none}
 <p id="empty-state">소개 글을 준비 중입니다.</p>
 <script>
   document.getElementById('empty-state').hidden =
-    Boolean(document.querySelector('main > section:not([hidden])'));
+    Boolean(document.querySelector('#story-01, main > section:not([hidden])'));
   document.querySelectorAll('main > section').forEach(section => {
     section.addEventListener('copy', event => event.preventDefault());
     section.addEventListener('contextmenu', event => event.preventDefault());
