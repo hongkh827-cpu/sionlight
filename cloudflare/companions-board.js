@@ -5,7 +5,7 @@ async function companionsBoard(request, env) {
   const headers = {
     "Cache-Control": "no-store",
     "X-Content-Type-Options": "nosniff",
-    "Referrer-Policy": "no-referrer",
+    "Referrer-Policy": "same-origin",
     "Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'"
   };
   const escape = (value) => String(value ?? "").replace(/[&<>"']/g, (character) =>
