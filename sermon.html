@@ -54,6 +54,13 @@
     background: #000c;
     color: white;
   }
+  [hidden] { display: none !important; }
+  .video-grid.shorts .video { aspect-ratio: 9 / 16; }
+  .manager { max-width: 480px; margin: 24px auto; text-align: left; }
+  .manager summary { color: #e8c17e; cursor: pointer; text-align: center; }
+  .manager label { display: block; margin-top: 12px; }
+  .manager input, .manager textarea { width: 100%; box-sizing: border-box; padding: 8px; font: inherit; }
+  .manager button { margin-top: 12px; padding: 8px 12px; font: inherit; }
   .footer { margin-top: 45px; color: #c8bca9; }
 </style>
 </head>
@@ -78,13 +85,33 @@
     </article>
   </section>
 
+  <section id="shorts-section" hidden aria-labelledby="shorts-title">
+    <h2 id="shorts-title">쇼츠</h2>
+    <div class="video-grid shorts" id="shorts-grid"></div>
+  </section>
+
   <div class="footer">
     SIONLIGHT 가상교회<br>
     빛과 위로가 머무는 공간
   </div>
+  <details class="manager" id="manage">
+    <summary>운영자 · 쇼츠 추가</summary>
+    <form id="shorts-form">
+      <label>유튜브 쇼츠 링크 <input name="url" type="url" required placeholder="https://youtube.com/shorts/…"></label>
+      <label>영상 제목 <input name="title" required maxlength="150"></label>
+      <button type="submit">게시할 목록 만들기</button>
+    </form>
+    <p id="manager-status" role="status"></p>
+    <div id="publish-steps" hidden>
+      <p>아래 목록을 복사한 뒤 GitHub 편집기에 붙여 넣고 <strong>Commit changes…</strong>를 눌러 저장하세요.</p>
+      <button id="copy-list" type="button">목록 복사</button>
+      <label>게시할 목록 <textarea id="list-output" rows="5" readonly></textarea></label>
+      <p><a href="https://github.com/hongkh827-cpu/sionlight/edit/main/sermon-shorts.json" target="_blank" rel="noopener">GitHub 편집기 열기</a></p>
+    </div>
+  </details>
 </div>
 <script>
-  document.querySelector('.video-grid').addEventListener('click', (event) => {
+  document.querySelector('.container').addEventListener('click', (event) => {
     const button = event.target.closest('button[data-video-id]');
     if (!button) return;
 
@@ -96,6 +123,85 @@
     player.allowFullscreen = true;
     button.replaceWith(player);
     player.focus();
+  });
+
+  const videoIdPattern = /^[A-Za-z0-9_-]{11}$/;
+  const manager = document.querySelector('#manage');
+  const form = document.querySelector('#shorts-form');
+  const status = document.querySelector('#manager-status');
+  const steps = document.querySelector('#publish-steps');
+  const output = document.querySelector('#list-output');
+
+  async function readShorts() {
+    const response = await fetch('sermon-shorts.json', { cache: 'no-store' });
+    if (!response.ok) throw new Error('목록을 불러오지 못했습니다.');
+    const list = await response.json();
+    if (!Array.isArray(list) || !list.every((item) =>
+      item && typeof item.title === 'string' && videoIdPattern.test(item.id)
+    )) throw new Error('쇼츠 목록의 형식을 확인해 주세요.');
+    return list;
+  }
+
+  function renderShort({ id, title }) {
+    const card = document.createElement('article');
+    card.className = 'video-card';
+    card.innerHTML = '<div class="video"><button type="button"><img alt="" loading="lazy"><span class="play-icon" aria-hidden="true">▶</span></button></div><h2></h2>';
+    const button = card.querySelector('button');
+    button.dataset.videoId = id;
+    button.setAttribute('aria-label', title + ' 재생');
+    card.querySelector('img').src = 'https://i.ytimg.com/vi/' + id + '/hqdefault.jpg';
+    card.querySelector('h2').textContent = title;
+    return card;
+  }
+
+  if (location.hash === '#manage') manager.open = true;
+  readShorts().then((list) => {
+    document.querySelector('#shorts-grid').replaceChildren(...list.map(renderShort));
+    document.querySelector('#shorts-section').hidden = list.length === 0;
+  }).catch((error) => { status.textContent = error.message; });
+
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    steps.hidden = true;
+    status.textContent = '';
+    const fields = new FormData(form);
+    const url = new URL(fields.get('url').trim());
+    const id = url.hostname === 'youtu.be'
+      ? url.pathname.slice(1)
+      : ['youtube.com', 'www.youtube.com', 'm.youtube.com'].includes(url.hostname)
+        ? url.pathname.match(/^\/shorts\/([^/]+)\/?$/)?.[1] ?? (url.pathname === '/watch' ? url.searchParams.get('v') : null)
+        : null;
+    const title = fields.get('title').trim();
+    if (!['http:', 'https:'].includes(url.protocol) || !videoIdPattern.test(id) || !title) {
+      status.textContent = '올바른 유튜브 링크와 제목을 입력해 주세요.';
+      return;
+    }
+
+    const submit = form.querySelector('button');
+    submit.disabled = true;
+    try {
+      const list = await readShorts();
+      if (list.some((item) => item.id === id)) {
+        status.textContent = '이미 등록된 영상입니다.';
+        return;
+      }
+      output.value = JSON.stringify([...list, { id, title }], null, 2) + '\n';
+      steps.hidden = false;
+    } catch (error) {
+      status.textContent = error.message;
+    } finally {
+      submit.disabled = false;
+    }
+  });
+
+  document.querySelector('#copy-list').addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(output.value);
+      status.textContent = '목록을 복사했습니다.';
+    } catch {
+      output.select();
+      status.textContent = '선택한 내용을 Ctrl+C로 복사해 주세요.';
+    }
   });
 </script>
 </body>
