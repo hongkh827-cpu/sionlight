@@ -172,7 +172,7 @@
         status.textContent = '이미 등록된 영상입니다.';
         return;
       }
-      output.value = JSON.stringify([...list, { id, title }], null, 2) + '\n';
+      output.value = JSON.stringify([{ id, title }, ...list], null, 2) + '\n';
       steps.hidden = false;
     } catch (error) {
       status.textContent = error.message;
