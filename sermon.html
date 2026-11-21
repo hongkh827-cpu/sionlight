@@ -71,7 +71,7 @@
   <h1>말씀 너머</h1>
   <p>빛과 위로가 머무는 공간, SIONLIGHT.</p>
 
-  <details class="manager" id="manage">
+  <details class="manager" id="manage" hidden>
     <summary>운영자 · 쇼츠 추가</summary>
     <form id="shorts-form">
       <label>유튜브 쇼츠 링크 <input name="url" type="url" required placeholder="https://youtube.com/shorts/…"></label>
@@ -146,7 +146,13 @@
     return card;
   }
 
-  if (location.hash === '#manage') manager.open = true;
+  function updateManagerVisibility() {
+    const showManager = location.hash === '#manage';
+    manager.hidden = !showManager;
+    manager.open = showManager;
+  }
+  updateManagerVisibility();
+  window.addEventListener('hashchange', updateManagerVisibility);
   readShorts().then((list) => {
     document.querySelector('#shorts-grid').replaceChildren(...list.map(renderShort));
     document.querySelector('#shorts-section').hidden = list.length === 0;
