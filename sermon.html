@@ -120,10 +120,28 @@
     return card;
   }
 
-  readShorts().then((list) => {
-    document.querySelector('#shorts-grid').replaceChildren(...list.map(renderShort));
-    document.querySelector('#shorts-section').hidden = list.length === 0;
-  }).catch((error) => console.error(error));
+  const shortsGrid = document.querySelector('#shorts-grid');
+  const shortsSection = document.querySelector('#shorts-section');
+  const savedVideos = fetch('https://sionlight-chat.hongkh827.workers.dev/sermon-videos.json')
+    .then((response) => {
+      if (!response.ok) throw new Error('등록 영상 목록을 불러오지 못했습니다.');
+      return response.json();
+    })
+    .catch((error) => { console.error(error); return []; });
+
+  readShorts().catch((error) => { console.error(error); return []; }).then(async (list) => {
+    shortsGrid.replaceChildren(...list.map(renderShort));
+    shortsSection.hidden = list.length === 0;
+    const saved = await savedVideos;
+    if (!Array.isArray(saved)) return;
+    const ids = new Set(list.map(({ id }) => id));
+    const newVideos = saved.filter((item) =>
+      item && typeof item.id === 'string' && videoIdPattern.test(item.id) &&
+      typeof item.title === 'string' && !ids.has(item.id)
+    );
+    shortsGrid.prepend(...newVideos.map(renderShort));
+    shortsSection.hidden = shortsGrid.childElementCount === 0;
+  });
 </script>
 </body>
 </html>
