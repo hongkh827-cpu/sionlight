@@ -138,6 +138,9 @@
     button.setAttribute('aria-label', title + ' 재생');
     card.querySelector('img').src = 'https://i.ytimg.com/vi/' + id + '/hqdefault.jpg';
     card.querySelector('h2').textContent = title;
+    if (id === 'FIpWSWXgauM') {
+      card.insertAdjacentHTML('beforeend', '<p><a href="https://billygraham.org/minutes/billy-graham-anxiety-relief" target="_blank" rel="noopener" style="color:inherit">빌리 그레이엄 전도협회 공식 원문 보기</a></p>');
+    }
     return card;
   }
 
