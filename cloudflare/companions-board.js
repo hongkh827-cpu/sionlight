@@ -13,7 +13,7 @@ async function companionsBoard(request, env) {
   );
   const page = (content, status = 200) => new Response(
     '<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">' +
-    '<title>삶의 동행 | SIONLIGHT</title><style>body{background:#101b2c;color:#f6e9d2;font:16px/1.7 system-ui;margin:0;padding:24px}main{max-width:650px;margin:auto}a{color:#f0cf96}article,section{border:1px solid #50617b;border-radius:12px;padding:16px;margin:18px 0}textarea,input,button{font:inherit}textarea{display:block;box-sizing:border-box;width:100%;margin:8px 0;background:#1b2b42;color:inherit;padding:8px}button{padding:6px 14px}p{overflow-wrap:anywhere;white-space:pre-wrap}</style>' +
+    '<title>삶의 동행 | ZIONLIGHT</title><style>body{background:#101b2c;color:#f6e9d2;font:16px/1.7 system-ui;margin:0;padding:24px}main{max-width:650px;margin:auto}a{color:#f0cf96}article,section{border:1px solid #50617b;border-radius:12px;padding:16px;margin:18px 0}textarea,input,button{font:inherit}textarea{display:block;box-sizing:border-box;width:100%;margin:8px 0;background:#1b2b42;color:inherit;padding:8px}button{padding:6px 14px}p{overflow-wrap:anywhere;white-space:pre-wrap}</style>' +
     '<main><a href="https://hongkh827-cpu.github.io/sionlight/companions.html">삶의 동행 안내</a><h1>삶의 동행</h1>' +
     '<p>삶의 동행은 만 19세 이상 성인을 위한 공간입니다.</p>' + content + '</main></html>',
     { status, headers: { ...headers, "Content-Type": "text/html; charset=utf-8" } }
